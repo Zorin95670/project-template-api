@@ -36,8 +36,9 @@ If you want to use application without docker in production **from scratch**, yo
 
 Init database file is `src/main/resources/db/init.sql`.
 
-## Run unit test
+## Test
 
+### Unit test
 Some unit tests need a real database to work, this database can be a docker container or another platform.
 
 You need to initialize database before.
@@ -45,6 +46,26 @@ You need to initialize database before.
 To run unit tests you must execute this commmands on your testing database:
 
 `mvn flyway:migrate -Dflyway.url=jdbc:postgresql://localhost:5432/db -Dflyway.user=#### -Dflyway.password=####`
+
+### Functional test
+
+Behavior-driven development (or BDD) is an agile software development technique that encourages collaboration between developers, QA and non-technical or business participants in a software project.
+
+_behave_ uses tests written in a natural language style, backed up by Python code.
+
+ - behave documentation: http://behave.readthedocs.io/
+ - behave.example: https://github.com/behave/behave.example
+
+Required minimum `behave` version: `1.2.6`, so we can use [tagged examples](https://github.com/behave/behave/blob/master/docs/new_and_noteworthy_v1.2.6.rst).
+
+Required minimum python version is 3.7.
+
+In order to run, got to `src/test/behave` folder and please ensure you properly define the following variables, either via environment or via `behave --define`:
+ - `URL`: defines the URL of the API. Defaulted to http://localhost:8080/PROJECT_NAME.
+
+You can see documentation about steps using the following command:
+
+`behave --steps-catalog`
 
 ## Useful tools
 
