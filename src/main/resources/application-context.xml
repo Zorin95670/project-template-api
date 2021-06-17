@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:p="http://www.springframework.org/schema/p"
+  xmlns:aop="http://www.springframework.org/schema/aop"
+  xmlns:jee="http://www.springframework.org/schema/jee"
+  xmlns:tx="http://www.springframework.org/schema/tx"
+  xmlns:task="http://www.springframework.org/schema/task"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+ http://www.springframework.org/schema/context
+ http://www.springframework.org/schema/context/spring-context-4.0.xsd
+ http://www.springframework.org/schema/tx
+ http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+ http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
+ http://www.springframework.org/schema/aop
+ http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+ http://www.springframework.org/schema/task
+ http://www.springframework.org/schema/task/spring-task-4.0.xsd
+ http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+  <context:annotation-config />
+
+  <context:component-scan
+    base-package="com.api" />
+  <context:property-placeholder
+    location="classpath:version.properties,classpath:application.properties" />
+
+  <tx:annotation-driven
+    transaction-manager="transactionManager" />
+
+  <bean id="dataSource"
+    class="org.apache.commons.dbcp2.BasicDataSource">
+    <property name="driverClassName"
+      value="org.postgresql.Driver"></property>
+    <property name="url"
+      value="jdbc:postgresql://${database.host:localhost}:${database.port:5432}/${database.name}" />
+    <property name="username"
+      value="${database.username}" />
+    <property name="password"
+      value="${database.password}" />
+    <property name="initialSize"
+      value="${database.initialSize:10}" />
+    <property name="maxTotal"
+      value="${database.maxTotal:150}" />
+    <property name="maxIdle"
+      value="${database.maxIdle:30}" />
+    <property name="maxWaitMillis"
+      value="${database.maxWaitMillis:1000}" />
+  </bean>
+  <bean id="transactionManager"
+    class="org.springframework.orm.jpa.JpaTransactionManager">
+    <property name="entityManagerFactory"
+      ref="entityManagerFactory" />
+  </bean>
+  <bean id="entityManagerFactory"
+    class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="dataSource" ref="dataSource" />
+    <property name="persistenceUnitName" value="JPA-PROJECT_NAME" />
+    <property name="jpaVendorAdapter">
+      <bean
+        class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+    </property>
+  </bean>
+
+  <!-- Flyway management -->
+  <bean id="flywayConfig"
+    class="org.flywaydb.core.api.configuration.ClassicConfiguration">
+    <property name="dataSource" ref="dataSource" />
+    <property name="baselineOnMigrate" value="true" />
+    <property name="outOfOrder" value="true" />
+  </bean>
+
+  <bean id="flyway" class="org.flywaydb.core.Flyway"
+    init-method="migrate">
+    <constructor-arg ref="flywayConfig" />
+  </bean>
+</beans>
